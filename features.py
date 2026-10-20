@@ -46,3 +46,4 @@ def extract_features(raw_url: str) -> dict:
         "num_hyphens_hostname": hostname.count("-"),
         "is_https": is_https,
     }
+

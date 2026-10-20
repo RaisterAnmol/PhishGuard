@@ -141,3 +141,4 @@ if scan_clicked or demo_url:
 
         # Step E: Disclaimer
         st.info("ℹ️ **Notice:** This assessment is generated purely by extracting lexical features from the URL string. A 'Likely Legitimate' result is an educational estimate and does not guarantee that a website is safe.")
+
