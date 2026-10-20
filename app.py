@@ -1,10 +1,7 @@
 """
-app.py - Minimal, Clean Web Application for PhishGuard Lite.
-1. Accepts typed URL
-2. Extracts the exact 5 features
-3. Predicts using the saved Decision Tree model
-4. Displays "Potentially Phishing" or "Likely Legitimate"
-5. Displays extracted features and college safety disclaimer
+app.py - Academic College Project Interface
+PhishGuard: Machine Learning-Based Phishing URL Classifier
+Designed for Viva Demonstration & Final Submission
 """
 
 from pathlib import Path
@@ -16,129 +13,278 @@ from features import extract_features, FEATURE_NAMES
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="PhishGuard Lite",
-    page_icon="🛡️",
-    layout="centered"
+    page_title="PhishGuard | Cyber Security Project",
+    page_icon="🔒",
+    layout="centered",
+    initial_sidebar_state="expanded"
 )
 
-# 2. Styling (Crisp, High-Contrast in Light and Dark Mode)
+# 2. Custom Academic Dashboard Styling (Clean, Professional, Non-AI Look)
 st.markdown("""
 <style>
-.main-title {
-    text-align: center;
-    font-size: 2.2rem;
+/* Main typography */
+html, body, [class*="css"] {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header Banner */
+.project-banner {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    color: #f8fafc;
+}
+.project-tag {
+    display: inline-block;
+    background: #334155;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+.project-title {
+    font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 0.2rem;
-}
-.sub-title {
-    text-align: center;
-    font-size: 1.05rem;
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-}
-.card {
-    padding: 1.5rem;
-    border-radius: 10px;
-    text-align: center;
-    margin-top: 1.2rem;
-    margin-bottom: 1.2rem;
-    font-size: 1.3rem;
-    font-weight: bold;
-}
-.card-safe {
-    background-color: #065f46;
     color: #ffffff;
-    border: 2px solid #10b981;
+    margin: 0;
+    line-height: 1.3;
 }
-.card-phish {
-    background-color: #991b1b;
-    color: #ffffff;
-    border: 2px solid #ef4444;
+.project-subtitle {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+/* Result Cards */
+.result-box {
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 18px 0;
+}
+.result-safe {
+    background-color: #064e3b;
+    border: 1px solid #059669;
+    color: #ecfdf5;
+}
+.result-danger {
+    background-color: #7f1d1d;
+    border: 1px solid #dc2626;
+    color: #fef2f2;
+}
+.result-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.result-desc {
+    font-size: 0.9rem;
+    margin-top: 6px;
+    opacity: 0.95;
+}
+
+/* Metric Tiles Grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+    margin-bottom: 14px;
+}
+.feature-tile {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+}
+.feature-title-text {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.feature-val {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-top: 4px;
+}
+
+/* Sample URL Button bar */
+.stButton button {
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Load Model Artifact
+# 3. Model Loading
 BASE_DIR = Path(__file__).resolve().parent
 model_path = BASE_DIR / "model.joblib"
 
 @st.cache_resource
-def load_saved_model():
+def load_model():
     if not model_path.exists():
         return None
     return joblib.load(model_path)
 
-model_package = load_saved_model()
+model_bundle = load_model()
 
-# 4. Header
-st.markdown('<div class="main-title">🛡️ PhishGuard Lite</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Simple Phishing URL Detection using Machine Learning</div>', unsafe_allow_html=True)
+# 4. Sidebar: Student College Viva Info
+with st.sidebar:
+    st.markdown("### 🎓 Academic Submission")
+    st.markdown("""
+    **Course Project:** Cyber Security / Machine Learning  
+    **Topic:** Heuristic Phishing URL Detection  
+    **Classifier:** Decision Tree (`scikit-learn`)  
+    **Dataset:** 10,000 URLs (Balanced 50/50)  
+    **Evaluation Accuracy:** 92.50%  
+    """)
+    st.divider()
+    st.markdown("### 📋 5 Extracted Features")
+    st.markdown("""
+    1. **URL Length** *(Character count)*
+    2. **Dot Count** *(Subdomains & host)*
+    3. **Presence of '@'** *(Browser deception)*
+    4. **Hyphens in Host** *(Brand impersonation)*
+    5. **HTTPS Protocol** *(Transport security)*
+    """)
+    st.divider()
+    st.caption("College Viva Reference: Decision tree depth bounded to prevent overfitting.")
 
-if model_package is None:
-    st.error("⚠️ Model file `model.joblib` not found! Please run `python train_model.py` first.")
+# 5. Header Banner
+st.markdown("""
+<div class="project-banner">
+    <div class="project-tag">Cybersecurity Lab Project</div>
+    <h1 class="project-title">🔒 PhishGuard URL Scanner</h1>
+    <p class="project-subtitle">Lexical feature extraction & supervised classification for detecting malicious hyperlinks.</p>
+</div>
+""", unsafe_allow_html=True)
+
+if model_bundle is None:
+    st.error("Error: `model.joblib` not found. Please execute `python train_model.py` to train the classifier.")
     st.stop()
 
-model = model_package["model"]
+model = model_bundle["model"]
 
-# 5. Quick One-Click Samples for Easy Viva Demo
-st.write("👉 **Test a sample URL or enter your own:**")
-c1, c2 = st.columns(2)
-demo_url = ""
-if c1.button("🔴 Phishing Sample", use_container_width=True):
-    demo_url = "http://paypal-verification-account-update.xyz/login.php?account=123"
-if c2.button("🟢 Legitimate Sample", use_container_width=True):
-    demo_url = "https://www.wikipedia.org/wiki/Computer_science"
+# 6. Pre-filled Quick Test Links for Viva Demonstration
+st.write("##### Select a demonstration test case or input a URL:")
+col1, col2 = st.columns(2)
+demo_input = ""
 
-# 6. URL Input Form
-user_input = st.text_input("Enter URL to scan:", value=demo_url, placeholder="e.g. http://mybank-login.com")
-scan_clicked = st.button("🔍 Scan URL", type="primary", use_container_width=True)
+if col1.button("📌 Load Phishing Test Sample", use_container_width=True):
+    demo_input = "http://paypal-verification-account-update.xyz/login.php?account=123"
 
-# 7. Prediction & Output
-if scan_clicked or demo_url:
-    cleaned_url = user_input.strip()
-    if not cleaned_url:
-        st.warning("Please type or paste a URL first.")
+if col2.button("📌 Load Legitimate Test Sample", use_container_width=True):
+    demo_input = "https://www.wikipedia.org/wiki/Computer_science"
+
+# 7. URL Input Box
+target_url = st.text_input(
+    label="Target URL to inspect:",
+    value=demo_input,
+    placeholder="https://example.com/path",
+    label_visibility="visible"
+)
+
+col_btn1, col_btn2 = st.columns([3, 1])
+scan_submitted = col_btn1.button("🔍 Analyze URL Features", type="primary", use_container_width=True)
+clear_input = col_btn2.button("Clear", use_container_width=True)
+
+if clear_input:
+    st.rerun()
+
+# 8. Inference & Presentation
+if scan_submitted or demo_input:
+    url_to_test = target_url.strip()
+    
+    if not url_to_test:
+        st.warning("Please provide a URL to evaluate.")
     else:
-        # Step A: Extract exact 5 features
-        features_dict = extract_features(cleaned_url)
-        df_features = pd.DataFrame([features_dict])[FEATURE_NAMES]
-
-        # Step B: Model Prediction
-        prediction = int(model.predict(df_features)[0])
-        # Decision tree probabilities: [prob_legit, prob_phish]
-        prob_phish = float(model.predict_proba(df_features)[0][1])
-
-        # Step C: Show Clean Result Card
+        # Extract features
+        feats = extract_features(url_to_test)
+        df_input = pd.DataFrame([feats])[FEATURE_NAMES]
+        
+        # Predict
+        prediction = int(model.predict(df_input)[0])
+        probabilities = model.predict_proba(df_input)[0]
+        phishing_prob = float(probabilities[1]) * 100
+        legit_prob = float(probabilities[0]) * 100
+        
+        # Verdict Display
         if prediction == 1:
             st.markdown(f"""
-            <div class="card card-phish">
-                🚨 Prediction: Potentially Phishing
-                <div style="font-size: 1rem; font-weight: normal; margin-top: 6px;">
-                    Estimated Phishing Risk: <b>{prob_phish * 100:.1f}%</b>
+            <div class="result-box result-danger">
+                <div class="result-heading">⚠️ Warning: Phishing Indicators Detected</div>
+                <div class="result-desc">
+                    The lexical structure matches phishing heuristics. Calculated Risk: <b>{phishing_prob:.1f}%</b>.
                 </div>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
-            <div class="card card-safe">
-                ✅ Prediction: Likely Legitimate
-                <div style="font-size: 1rem; font-weight: normal; margin-top: 6px;">
-                    Estimated Phishing Risk: <b>{prob_phish * 100:.1f}%</b>
+            <div class="result-box result-safe">
+                <div class="result-heading">✅ Verified: Likely Legitimate URL</div>
+                <div class="result-desc">
+                    URL structure aligns with benign patterns. Confidence: <b>{legit_prob:.1f}%</b> (Risk: {phishing_prob:.1f}%).
                 </div>
             </div>
             """, unsafe_allow_html=True)
+        
+        # Feature Breakdown Tiles
+        st.write("##### Extracted Lexical Attributes:")
+        st.markdown(f"""
+        <div class="feature-grid">
+            <div class="feature-tile">
+                <div class="feature-title-text">Length</div>
+                <div class="feature-val">{feats['url_length']}</div>
+            </div>
+            <div class="feature-tile">
+                <div class="feature-title-text">Dots</div>
+                <div class="feature-val">{feats['num_dots']}</div>
+            </div>
+            <div class="feature-tile">
+                <div class="feature-title-text">'@' Symbol</div>
+                <div class="feature-val">{'Yes' if feats['has_at_symbol'] else 'No'}</div>
+            </div>
+            <div class="feature-tile">
+                <div class="feature-title-text">Hyphens</div>
+                <div class="feature-val">{feats['num_hyphens_hostname']}</div>
+            </div>
+            <div class="feature-tile">
+                <div class="feature-title-text">HTTPS</div>
+                <div class="feature-val">{'Active' if feats['is_https'] else 'None'}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Educational explanation expander
+        with st.expander("🔍 Detailed Technical Evaluation & Viva Notes", expanded=False):
+            st.markdown("""
+            | Feature | Measured Value | Security Significance |
+            | :--- | :--- | :--- |
+            | **URL Length** | `{url_len}` chars | Phishing links often embed redirects, tokens, or long randomized subdomains to evade basic regex filters. |
+            | **Dot Count** | `{dots}` dots | Attackers stack fake subdomains (`paypal.com.verify-user.co`) to deceive human inspection. |
+            | **`@` Symbol** | `{at_sym}` | The `@` delimiter causes standard web browsers to discard all characters before it and navigate to the remaining domain. |
+            | **Hostname Hyphens** | `{hyphens}` hyphens | Legitimate corporate domains rarely chain hyphens; phishers use them to fake brands (`chase-secure-login`). |
+            | **HTTPS Scheme** | `{https_val}` | Plain `http://` lacks transport encryption. Modern legitimate login portals enforce TLS (`https://`). |
+            """.format(
+                url_len=feats['url_length'],
+                dots=feats['num_dots'],
+                at_sym="Present" if feats['has_at_symbol'] else "None",
+                hyphens=feats['num_hyphens_hostname'],
+                https_val="Active (TLS)" if feats['is_https'] else "Inactive (Insecure)"
+            ))
+            
+            st.caption("**Note for Examiner/Viva:** Lexical analysis inspects structure without fetching remote HTML payloads, preventing drive-by malware infections.")
 
-        # Step D: Show Extracted 5 Features Table (Great for Viva Explanation)
-        with st.expander("📊 Extracted Features for this URL", expanded=True):
-            display_df = pd.DataFrame([
-                {"Feature": "1. Total URL Length", "Value": features_dict["url_length"], "Explanation": "Long URLs often hide malicious tokens"},
-                {"Feature": "2. Dot Count", "Value": features_dict["num_dots"], "Explanation": "Excessive dots indicate subdomains or IP addresses"},
-                {"Feature": "3. Has '@' Symbol", "Value": "Yes" if features_dict["has_at_symbol"] else "No", "Explanation": "'@' tricks browsers to ignore preceding text"},
-                {"Feature": "4. Hostname Hyphens", "Value": features_dict["num_hyphens_hostname"], "Explanation": "Hyphens are used to mimic brand names (e.g. paypal-update)"},
-                {"Feature": "5. Uses HTTPS", "Value": "Yes" if features_dict["is_https"] else "No", "Explanation": "1 if secure scheme, 0 if plain HTTP"},
-            ])
-            st.dataframe(display_df, hide_index=True, use_container_width=True)
-
-        # Step E: Disclaimer
-        st.info("ℹ️ **Notice:** This assessment is generated purely by extracting lexical features from the URL string. A 'Likely Legitimate' result is an educational estimate and does not guarantee that a website is safe.")
-
+        st.caption("⚠️ **Safety Notice:** Machine learning predictions are heuristic estimates. Always exercise caution before submitting credentials online.")
